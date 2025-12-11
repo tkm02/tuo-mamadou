@@ -24,6 +24,15 @@ export const metadata: Metadata = {
   },
 }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * The root layout component that wraps the entire app.
+ * It sets the HTML language, suppresses hydration warnings, and sets the font family and background color.
+ * It also wraps the app with the theme provider and analytics.
+ * @param {{ children: React.ReactNode }} props - The props object.
+ * @param {React.ReactNode} props.children - The children to render.
+ */
+/*******  acd2b870-ae13-4460-acda-bc40fc727a21  *******/
 export default function RootLayout({
   children,
 }: Readonly<{
