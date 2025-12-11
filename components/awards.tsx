@@ -31,6 +31,18 @@ export default function Awards() {
         "Intégration LLM pour assistance intelligente",
       ],
     },
+     {
+      title: "3ème Meilleure Application Agricole en Côte d'Ivoire",
+      description: "Application IoT pour la gestion agricole intelligente",
+      icon: Award,
+      date: "Novembre 2025",
+      color: "#00FF94",
+      details: [
+        "Surveillance en temps réel des cultures",
+        "Alertes automatisées pour les agriculteurs",
+        "Optimisation des rendements agricoles",
+      ],
+    },
     {
       title: "2ème Prix APPRENTISSAGE PAR PROJET 03",
       description: "Valorisation du secteur vivrier en Côte d'Ivoire",
@@ -43,6 +55,7 @@ export default function Awards() {
         "Impact économique et social",
       ],
     },
+   
   ]
 
   const certifications = [
@@ -217,7 +230,7 @@ export default function Awards() {
         {/* Summary Stats */}
         <div className="mt-16 grid grid-cols-2 md:grid-cols-3 gap-6">
           {[
-            { label: "Prix Remportés", value: "3", icon: "🏆" },
+            { label: "Prix Remportés", value: "3+", icon: "🏆" },
             { label: "Certifications", value: "5", icon: "📜" },
             { label: "Reconnaissance", value: "100%", icon: "⭐" },
           ].map((stat, idx) => (
