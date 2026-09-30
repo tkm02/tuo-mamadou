@@ -151,8 +151,10 @@ export function burst(x: number, y: number, count = 90) {
 export function glitter() {
   if (typeof window === "undefined" || reduced()) return
   const css = getComputedStyle(document.documentElement)
-  const palette = ["--jaune", "--jaune", "--orange", "--blanc", "--bleu", "--vert"].map((v) => css.getPropertyValue(v).trim())
-  const colors = [...palette, "#ffe89a", "#f5b700"]
+  // Sur la scène orange : surtout du blanc, un peu de noir et d'orange profond pour le relief.
+  const blanc = css.getPropertyValue("--blanc").trim() || "#fff"
+  const noir = css.getPropertyValue("--noir").trim() || "#141414"
+  const colors = [blanc, blanc, blanc, "#fff1e6", "#ffd2b3", noir, "#c94a00"]
   const W = innerWidth
   const H = innerHeight
   const canvas = document.createElement("canvas")

@@ -1,5 +1,5 @@
 import type { Field } from "@/lib/admin/resources"
-import { aboutFallback, contactFallback, heroFallback, socialsFallback } from "@/lib/fallback-data"
+import { aboutFallback, awardsSectionFallback, contactFallback, heroFallback, socialsFallback } from "@/lib/fallback-data"
 import { normalizeTheme, themeFallback } from "@/lib/theme"
 
 export type ContentSection = {
@@ -135,6 +135,35 @@ export const CONTENT_SECTIONS: ContentSection[] = [
       },
       { name: "badge", label: "Badge", type: "text", hidden: true },
       { name: "recognitionsText", label: "Reconnaissances", type: "textarea", hidden: true },
+    ],
+  },
+  {
+    key: "awards",
+    label: "Victoires",
+    description: "La photo en arrière-plan de la section des prix, et la vitrine des trophées. Les prix eux-mêmes se gèrent dans « Distinctions ».",
+    anchor: "awards",
+    fallback: awardsSectionFallback,
+    fields: [
+      {
+        name: "backgroundImage",
+        label: "Image d'arrière-plan",
+        type: "image",
+        help: "Affichée en haut de la section, assombrie pour garder le texte lisible. Format paysage conseillé. Laisse vide pour un fond noir uni.",
+        group: "Arrière-plan",
+      },
+      {
+        name: "trophies",
+        label: "Trophées",
+        type: "objectList",
+        addLabel: "un trophée",
+        group: "Vitrine des trophées",
+        help: "Affichés en grand sur un panneau blanc dans la section Victoires, dans cet ordre ; un clic les ouvre en plein écran. PNG sans fond, format portrait. Sans trophée, la vitrine est masquée.",
+        itemFields: [
+          { name: "image", label: "Photo (PNG sans fond)", type: "image" },
+          { name: "title", label: "Titre", type: "text" },
+          { name: "caption", label: "Légende (événement, année)", type: "text" },
+        ],
+      },
     ],
   },
   {

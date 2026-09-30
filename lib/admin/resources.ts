@@ -119,6 +119,13 @@ export const RESOURCES: ResourceConfig[] = [
       },
       { name: "impactLabel", label: "Libellé de l'impact", type: "text", group: "Impact", half: true, placeholder: "Véhicules suivis" },
       {
+        name: "trophy",
+        label: "Photo du trophée",
+        type: "image",
+        group: "Trophée",
+        help: "PNG sans fond, format portrait. Affiché en bas de la fiche de la mission, sur un socle. Laisse vide si la mission n'a pas de trophée.",
+      },
+      {
         name: "proofs",
         label: "Preuves (captures, photos)",
         type: "objectList",
@@ -168,6 +175,13 @@ export const RESOURCES: ResourceConfig[] = [
       { name: "technologies", label: "Technologies", type: "tags", group: "Visuel", placeholder: "Ajouter une technologie" },
       { name: "award", label: "Projet primé", type: "boolean", group: "Prix", half: true },
       { name: "awardLabel", label: "Libellé du prix", type: "text", group: "Prix", half: true, placeholder: "1er Prix" },
+      {
+        name: "trophy",
+        label: "Photo du trophée",
+        type: "image",
+        group: "Prix",
+        help: "PNG sans fond, format portrait. Affiché sous la description du projet, sur un socle.",
+      },
       { name: "demoUrl", label: "Lien démo", type: "text", group: "Liens", half: true, placeholder: "https://…" },
       { name: "githubUrl", label: "Lien GitHub", type: "text", group: "Liens", half: true, placeholder: "https://github.com/…" },
       { name: "color", label: "Couleur", type: "color", hidden: true },

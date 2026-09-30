@@ -25,6 +25,7 @@ export function rowIssues(table: string, row: Row): Issue[] {
     case "projects":
       if (empty(row.image)) issues.push({ level: "improve", text: "Pas de capture d'écran (le site affiche la pile technique)." })
       if (row.award && empty(row.awardLabel)) issues.push({ level: "fix", text: "Marqué primé mais sans libellé de prix." })
+      if (row.award && empty(row.trophy)) issues.push({ level: "improve", text: "Projet primé sans photo du trophée." })
       if (empty(row.description)) issues.push({ level: "improve", text: "Pas de description." })
       break
     case "awards":

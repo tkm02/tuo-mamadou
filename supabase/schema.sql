@@ -29,6 +29,7 @@ create table if not exists experiences (
   "impactLabel" text not null default '',
   color text not null default '#5B8BFF',
   proofs jsonb not null default '[]'::jsonb,
+  trophy text not null default '',
   "sortOrder" int not null default 0,
   "createdAt" timestamptz not null default now()
 );
@@ -62,6 +63,7 @@ create table if not exists projects (
   "awardLabel" text not null default '',
   "demoUrl" text not null default '',
   "githubUrl" text not null default '',
+  trophy text not null default '',
   "sortOrder" int not null default 0,
   "createdAt" timestamptz not null default now()
 );
@@ -142,6 +144,13 @@ create table if not exists contact_messages (
   read boolean not null default false,
   "createdAt" timestamptz not null default now()
 );
+
+-- ---------- MISES À JOUR ----------
+-- Colonnes ajoutées après la création des tables : relancer ce fichier les ajoute sans rien effacer.
+
+-- Photo du trophée (PNG sans fond) sous les missions et projets primés.
+alter table experiences add column if not exists trophy text not null default '';
+alter table projects add column if not exists trophy text not null default '';
 
 -- ---------- SÉCURITÉ (RLS) ----------
 -- Lecture publique du contenu, écriture réservée à l'utilisateur connecté (toi).

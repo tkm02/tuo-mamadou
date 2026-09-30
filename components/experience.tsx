@@ -4,6 +4,7 @@ import type React from "react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Lightbox from "@/components/lightbox"
 import { Container, FilterChip, SectionHead, Sticker, type Accent } from "@/components/kit"
+import { TrophyStand } from "@/components/trophy"
 import { useTable } from "@/lib/use-portfolio"
 import { educationFallback, experiencesFallback, type EducationRow, type ExperienceRow, type Proof } from "@/lib/fallback-data"
 import { clean, cn, isOngoing } from "@/lib/utils"
@@ -341,6 +342,16 @@ function MissionDetail({
         >
           Voir les preuves ({e.proofs.length})
         </button>
+      ) : null}
+
+      {/* L'espace du trophée, en bas de la fiche. */}
+      {e.trophy ? (
+        <TrophyStand
+          src={e.trophy}
+          title={[clean(e.impact), clean(e.impactLabel)].filter(Boolean).join(" ") || clean(e.role)}
+          caption={[clean(e.company), clean(e.period)].filter(Boolean).join(" · ")}
+          className="mt-8 border-t-2 border-noir/10 pt-8"
+        />
       ) : null}
     </article>
   )

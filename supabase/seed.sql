@@ -96,11 +96,11 @@ do $seed$
 begin
   if not exists (select 1 from awards) then
     insert into awards ("title", "description", "icon", "date", "color", "details", "sortOrder")
-    values ('Prix de la meilleure innovation inclusive', 'SahelTech', 'Award', 'Mai 2026', '#F653FF', '[]'::jsonb, 0);
+    values ('Prix de la meilleure innovation inclusive', 'Sahel Tech Innovation Challenge (STIC''26), Burkina Faso. Le projet INA (I''m Not Alone) remporte le prix de l''innovation inclusive parmi près de 60 équipes, avec une présentation en ligne.', 'Award', 'Mai 2026', '#F653FF', '["Près de 60 équipes en compétition","Projet INA (I''m Not Alone)","Présentation en ligne"]'::jsonb, 0);
     insert into awards ("title", "description", "icon", "date", "color", "details", "sortOrder")
     values ('1er Prix Compétition Moov Application', '1er prix et Prix d''innovation de la compétition Moov Application', 'Trophy', 'Déc. 2025', '#FFBE0B', '["Plateforme d''écoute anonyme et d''orientation en santé mentale","Chef d''équipe : coordination et pilotage du projet","PWA Next.js et Supabase"]'::jsonb, 1);
     insert into awards ("title", "description", "icon", "date", "color", "details", "sortOrder")
-    values ('3ème Place Intech Challenge', 'Intech Challenge avec Domaine Bini', 'Award', 'Déc. 2025', '#5B8BFF', '[]'::jsonb, 2);
+    values ('3ème Place Intech Challenge', 'Solution d''amélioration du service client des sites du Domaine Bini, avec le contrôle et la gestion des sites intégrés. 3e face à plusieurs écoles, et meilleure équipe à présenter un projet terminé.', 'Award', 'Déc. 2025', '#5B8BFF', '["Service client des sites du Domaine Bini","Contrôle et gestion des sites intégrés","Meilleure équipe avec un projet terminé"]'::jsonb, 2);
     insert into awards ("title", "description", "icon", "date", "color", "details", "sortOrder")
     values ('3ème Meilleure application de Côte d''Ivoire', 'Prix FAO, Journée mondiale de l''alimentation, Ministère de l''Agriculture. Application IoT pour la gestion agricole intelligente', 'Award', 'Oct. 2025', '#00FF94', '["Surveillance en temps réel des cultures","Alertes automatisées pour les agriculteurs","Optimisation des rendements agricoles"]'::jsonb, 3);
     insert into awards ("title", "description", "icon", "date", "color", "details", "sortOrder")
@@ -209,3 +209,8 @@ insert into site_content (key, value) values ('about', '{"badge":"À Propos de M
 insert into site_content (key, value) values ('contact', '{"email":"mamadoutuo77@gmail.com","phone":"+225 07 58 02 42 50","phoneHref":"tel:+2250758024250","location":"Abidjan, Côte d''Ivoire"}'::jsonb) on conflict (key) do nothing;
 insert into site_content (key, value) values ('socials', '{"github":"https://github.com/tkm02","linkedin":"https://linkedin.com/in/mamadou-tuo","email":"mamadoutuo77@gmail.com"}'::jsonb) on conflict (key) do nothing;
 insert into site_content (key, value) values ('theme', '{"noir":"#141414","orange":"#FF6A13","papier":"#F4F4F0","blanc":"#FFFFFF","jaune":"#FFD23F","sapin":"#0F7B5F","bleu":"#3A5BFF","vert":"#19C37D"}'::jsonb) on conflict (key) do nothing;
+insert into site_content (key, value) values ('awards', '{"backgroundImage":"/awards/trophees.jpg","trophies":[{"image":"/awards/trophees/sahel-tech-2026.png","title":"Prix de l''innovation inclusive","caption":"Sahel Tech Innovation Challenge, 2026"},{"image":"/awards/trophees/mass-icesco-2025.png","title":"1er Prix, Grand Prix ICESCO","caption":"Hackathon MASS, 2025"},{"image":"/awards/trophees/aeemci-ina.png","title":"Projet INA (I''m Not Alone)","caption":"AEEMCI ESATIC"}]}'::jsonb) on conflict (key) do nothing;
+
+-- Trophées : n'écrase jamais une photo déjà choisie dans le backoffice.
+update experiences set trophy = '/awards/trophees/mass-icesco-2025.png' where role = '1er Prix - Hackathon ICESCO' and trophy = '';
+update projects set trophy = '/awards/trophees/mass-icesco-2025.png' where title = 'Solution Agriculture Durable - ICESCO' and trophy = '';

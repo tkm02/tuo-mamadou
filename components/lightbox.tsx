@@ -10,11 +10,14 @@ export default function Lightbox({
   images,
   heading,
   caption,
+  light = false,
   onClose,
 }: {
   images: LightboxImage[] | null
   heading?: string
   caption?: string
+  /** Fond blanc derrière l'image (PNG sans fond, comme les trophées). */
+  light?: boolean
   onClose: () => void
 }) {
   const ref = useRef<HTMLDialogElement>(null)
@@ -65,7 +68,7 @@ export default function Lightbox({
             </button>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={img.url} alt={clean(img.title ?? heading ?? "")} className="max-h-[72vh] w-full bg-noir object-contain" />
+          <img src={img.url} alt={clean(img.title ?? heading ?? "")} className={`max-h-[72vh] w-full object-contain ${light ? "bg-blanc" : "bg-noir"}`} />
           {caption || count > 1 ? (
             <div className="flex items-center justify-between gap-4 px-5 py-4 text-[1rem]">
               {count > 1 ? (

@@ -4,6 +4,7 @@ import type React from "react"
 import { useMemo, useState } from "react"
 import { Container, FilterChip, SectionHead, Star, accentAt, tiltOf, type Accent } from "@/components/kit"
 import { burst } from "@/components/motion"
+import { TrophyStand } from "@/components/trophy"
 import { useTable } from "@/lib/use-portfolio"
 import { projectsFallback, type ProjectRow } from "@/lib/fallback-data"
 import { clean, cn } from "@/lib/utils"
@@ -162,6 +163,15 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
               </a>
             ) : null}
           </div>
+        ) : null}
+        {p.trophy ? (
+          <TrophyStand
+            src={p.trophy}
+            title={clean(p.awardLabel) || "Projet primé"}
+            caption={clean(p.year)}
+            compact
+            className="mt-8 [&_.trophy-stage]:[--stage:var(--blanc)] [&_.trophy-stage]:shadow-[var(--lift)]"
+          />
         ) : null}
       </div>
     </article>

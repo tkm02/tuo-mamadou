@@ -22,6 +22,8 @@ export type ExperienceRow = {
   impactLabel: string
   color: string
   proofs: Proof[]
+  /** Photo du trophée (PNG sans fond), affichée en bas de la fiche. */
+  trophy?: string
   sortOrder?: number
 }
 
@@ -51,6 +53,8 @@ export type ProjectRow = {
   awardLabel: string
   demoUrl: string
   githubUrl: string
+  /** Photo du trophée (PNG sans fond), affichée sous le projet. */
+  trophy?: string
   sortOrder?: number
 }
 
@@ -183,6 +187,29 @@ export const contactFallback = {
   phone: "+225 07 58 02 42 50",
   phoneHref: "tel:+2250758024250",
   location: "Abidjan, Côte d'Ivoire",
+}
+
+export type Trophy = { image: string; title: string; caption: string }
+
+export const awardsSectionFallback: { backgroundImage: string; trophies: Trophy[] } = {
+  backgroundImage: "/awards/trophees.jpg",
+  trophies: [
+    {
+      image: "/awards/trophees/sahel-tech-2026.png",
+      title: "Prix de l'innovation inclusive",
+      caption: "Sahel Tech Innovation Challenge, 2026",
+    },
+    {
+      image: "/awards/trophees/mass-icesco-2025.png",
+      title: "1er Prix, Grand Prix ICESCO",
+      caption: "Hackathon MASS, 2025",
+    },
+    {
+      image: "/awards/trophees/aeemci-ina.png",
+      title: "Projet INA (I'm Not Alone)",
+      caption: "AEEMCI ESATIC",
+    },
+  ],
 }
 
 export const socialsFallback = {
@@ -392,6 +419,7 @@ export const experiencesFallback: ExperienceRow[] = [
     impactLabel: "Prix ICESCO",
     color: "#5B8BFF",
     proofs: [],
+    trophy: "/awards/trophees/mass-icesco-2025.png",
   },
   {
     role: "2ème Prix - African Digital Week Hackathon",
@@ -757,6 +785,7 @@ export const projectsFallback: ProjectRow[] = [
     awardLabel: "1er Prix",
     demoUrl: "",
     githubUrl: "",
+    trophy: "/awards/trophees/mass-icesco-2025.png",
   },
   {
     title: "Application MahouFarm",
@@ -822,11 +851,12 @@ export const projectsFallback: ProjectRow[] = [
 export const awardsFallback: AwardRow[] = [
   {
     title: "Prix de la meilleure innovation inclusive",
-    description: "SahelTech",
+    description:
+      "Sahel Tech Innovation Challenge (STIC'26), Burkina Faso. Le projet INA (I'm Not Alone) remporte le prix de l'innovation inclusive parmi près de 60 équipes, avec une présentation en ligne.",
     icon: "Award",
     date: "Mai 2026",
     color: "#F653FF",
-    details: [],
+    details: ["Près de 60 équipes en compétition", "Projet INA (I'm Not Alone)", "Présentation en ligne"],
   },
   {
     title: "1er Prix Compétition Moov Application",
@@ -842,11 +872,12 @@ export const awardsFallback: AwardRow[] = [
   },
   {
     title: "3ème Place Intech Challenge",
-    description: "Intech Challenge avec Domaine Bini",
+    description:
+      "Solution d'amélioration du service client des sites du Domaine Bini, avec le contrôle et la gestion des sites intégrés. 3e face à plusieurs écoles, et meilleure équipe à présenter un projet terminé.",
     icon: "Award",
     date: "Déc. 2025",
     color: "#5B8BFF",
-    details: [],
+    details: ["Service client des sites du Domaine Bini", "Contrôle et gestion des sites intégrés", "Meilleure équipe avec un projet terminé"],
   },
   {
     title: "3ème Meilleure application de Côte d'Ivoire",
