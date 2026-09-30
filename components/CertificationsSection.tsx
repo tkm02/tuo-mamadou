@@ -3,79 +3,14 @@
 import { Award, CheckCircle2, ExternalLink, Eye } from "lucide-react"
 import { useState } from "react"
 import CertificationModal from "@/components/CertificationModal"
+import { useTable } from "@/lib/use-portfolio"
+import { certificationsFallback, type CertificationRow } from "@/lib/fallback-data"
 
 export default function CertificationsSection() {
   const [selectedCert, setSelectedCert] = useState<any>(null)
   const [isDark, setIsDark] = useState(true)
 
-  const certifications = [
-    {
-      name: "Project Management Fundamentals",
-      provider: "Google",
-      logo: "🔵",
-      color: "#0668E1",
-      year: "2025",
-      skills: ["Gestion", "Planning", "Agile"],
-      certificateUrl: "/certificates/Coursera project_manager.pdf",
-      certificateType: "pdf",
-      verificationUrl: "https://coursera.org/verify/BJUPR1V6QHSW",
-    },
-    {
-      name: "Agile and Scrum Development",
-      provider: "IBM",
-      logo: "🔷",
-      color: "#0668E1",
-      year: "2025",
-      skills: ["Scrum", "Sprint", "Kanban"],
-      certificateUrl: "/certificates/Coursera agile.pdf",
-      certificateType: "pdf",
-      verificationUrl: "https://coursera.org/verify/FHLELI3UIQ0X",
-    },
-    {
-      name: "Programming with JavaScript",
-      provider: "Meta",
-      logo: "⚛️",
-      color: "#0668E1",
-      year: "2025",
-      skills: ["ES6+", "Async", "DOM"],
-      certificateUrl: "/certificates/Coursera met_javascript.pdf",
-      certificateType: "pdf",
-      verificationUrl: "https://coursera.org/verify/UFP41QX8T5PU",
-    },
-    {
-      name: "Front-End Development",
-      provider: "Meta",
-      logo: "🎨",
-      color: "#0668E1",
-      year: "2025",
-      skills: ["React", "HTML", "CSS"],
-      certificateUrl: "/certificates/Coursera frontend.pdf",
-      certificateType: "pdf",
-      verificationUrl: "https://coursera.org/verify/GJE0UQC5Q9LW",
-    },
-    {
-      name: "Back-End Development",
-      provider: "Meta",
-      logo: "⚙️",
-      color: "#0668E1",
-      year: "2025",
-      skills: ["Node.js", "API", "Database"],
-      certificateUrl: "/certificates/Coursera meta_backend.pdf",
-      certificateType: "pdf",
-      verificationUrl: "https://coursera.org/verify/VVW428ROC83W",
-    },
-    {
-      name: "Data Science Fundamentals",
-      provider: "Africa TechUp Tour",
-      logo: "📊",
-      color: "#0668E1",
-      year: "2025 - En cours",
-      skills: ["Python", "ML", "Analytics"],
-      certificateUrl: "/certificates/techup-datascience.png",
-      certificateType: "image",
-      verificationUrl: undefined,
-    },
-  ]
+  const certifications = useTable<CertificationRow>("certifications", certificationsFallback)
 
   const darkBg = "bg-slate-950"
   const lightBg = "bg-white"

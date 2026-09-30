@@ -1,256 +1,204 @@
 "use client"
 
-import { Trophy, Award, CheckCircle2 } from "lucide-react"
-import { useState } from "react"
+import type React from "react"
+import { useEffect, useRef, useState } from "react"
+import CertificatePreview from "@/components/certificate-preview"
+import { Container, SectionHead, Star as StarIcon, type Accent } from "@/components/kit"
+import { burst, glitter, useHolo } from "@/components/motion"
+import { useTable } from "@/lib/use-portfolio"
+import { awardsFallback, certificationsFallback, type AwardRow, type CertificationRow } from "@/lib/fallback-data"
+import { clean, cn, splitRank } from "@/lib/utils"
+
+const CARD_COLORS: Accent[] = ["orange", "bleu", "vert", "sapin", "jaune"]
 
 export default function Awards() {
-  const [isDark, setIsDark] = useState(true)
+  const awards = useTable<AwardRow>("awards", awardsFallback)
+  const certifications = useTable<CertificationRow>("certifications", certificationsFallback)
 
-  const awards = [
-    {
-      title: "1er Prix HACKATHON ICESCO",
-      description: "Solution intelligente pour l'agriculture durable en Afrique",
-      icon: Trophy,
-      date: "Mai 2025",
-      color: "#FFBE0B",
-      details: [
-        "Système IoT avec capteurs et télédétection",
-        "Intégration d'Intelligence Artificielle",
-        "Impact social en milieu agricole africain",
-      ],
-    },
-    {
-      title: "2ème Prix AFRICAN DIGITAL WEEK",
-      description: "Services publics accessibles avec IA multilingue en Côte d'Ivoire",
-      icon: Award,
-      date: "Juin 2025",
-      color: "#F653FF",
-      details: [
-        "Chef d'équipe et coordination du projet",
-        "Plateforme citoyenne innovante",
-        "Intégration LLM pour assistance intelligente",
-      ],
-    },
-     {
-      title: "3ème Meilleure Application Agricole en Côte d'Ivoire",
-      description: "Application IoT pour la gestion agricole intelligente",
-      icon: Award,
-      date: "Novembre 2025",
-      color: "#00FF94",
-      details: [
-        "Surveillance en temps réel des cultures",
-        "Alertes automatisées pour les agriculteurs",
-        "Optimisation des rendements agricoles",
-      ],
-    },
-    {
-      title: "2ème Prix APPRENTISSAGE PAR PROJET 03",
-      description: "Valorisation du secteur vivrier en Côte d'Ivoire",
-      icon: Award,
-      date: "Février 2024",
-      color: "#5B8BFF",
-      details: [
-        "Solution web interactive",
-        "Data visualization avancée",
-        "Impact économique et social",
-      ],
-    },
-   
-  ]
+  const ranked = awards.map((a) => ({ a, r: splitRank(a.title) }))
+  const firsts = ranked.filter(({ r }) => r.n === 1)
+  const others = ranked.filter(({ r }) => r.n !== 1)
 
-  const certifications = [
-    { name: "Project Management Fundamentals", issuer: "Google", year: "2024", icon: "📊" },
-    { name: "Agile and Scrum Development Fundamentals", issuer: "IBM", year: "2024", icon: "⚙️" },
-    { name: "Programming with JavaScript", issuer: "Meta", year: "2023", icon: "⚛️" },
-    { name: "Introduction to Back-End Development", issuer: "Meta", year: "2023", icon: "🔧" },
-    { name: "Introduction to Front-End Development", issuer: "Meta", year: "2023", icon: "🎨" },
-  ]
-
-  const darkBg = "bg-slate-950"
-  const lightBg = "bg-white"
-  const darkText = "text-white"
-  const lightText = "text-slate-900"
-  const darkCardBg = "bg-slate-900/50"
-  const lightCardBg = "bg-slate-100/50"
-  const darkBorder = "border-slate-800"
-  const lightBorder = "border-slate-200"
-  const darkMuted = "text-slate-400"
-  const lightMuted = "text-slate-600"
-
-  const currentBg = isDark ? darkBg : lightBg
-  const currentText = isDark ? darkText : lightText
-  const currentCardBg = isDark ? darkCardBg : lightCardBg
-  const currentBorder = isDark ? darkBorder : lightBorder
-  const currentMuted = isDark ? darkMuted : lightMuted
+  // Paillettes à chaque arrivée sur la section, pas plus d'une fois toutes les 8 secondes.
+  const [preview, setPreview] = useState<CertificationRow | null>(null)
+  const section = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const el = section.current
+    if (!el) return
+    let lastFire = -Infinity
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting || performance.now() - lastFire < 8000) return
+        lastFire = performance.now()
+        glitter()
+      },
+      { threshold: 0.2 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   return (
-    <section
-      id="awards"
-      className={`relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300 ${currentBg}`}
-    >
-      {/* Floating Elements - Dark Mode */}
-      {isDark && (
-        <>
-          <div className="absolute top-0 -right-40 w-96 h-96 bg-slate-800/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-40 w-80 h-80 bg-slate-800/10 rounded-full blur-3xl"></div>
-        </>
-      )}
+    <section ref={section} id="awards" aria-labelledby="awards-title" className="field-noir relative overflow-hidden py-[clamp(5rem,11vw,9rem)]">
+      <Container>
+        <SectionHead
+          id="awards"
+          title="Les"
+          mark="victoires"
+          markColor="orange"
+          data={`${awards.length} prix · ${certifications.length} certifications`}
+          dataColor="blanc"
+        >
+          Hackathons, compétitions, concours : la plupart remportés comme chef d&apos;équipe.
+        </SectionHead>
 
-      {/* Floating Elements - Light Mode */}
-      {!isDark && (
-        <>
-          <div className="absolute top-0 -right-40 w-96 h-96 bg-blue-100/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-40 w-80 h-80 bg-pink-100/20 rounded-full blur-3xl"></div>
-        </>
-      )}
-
-      <div className="relative max-w-6xl mx-auto z-10">
-        {/* Header */}
-        <div className="mb-16 space-y-4">
-          <h2 className={`text-4xl md:text-5xl font-bold ${currentText}`}>
-            Prix & Reconnaissances
-          </h2>
-          <p className={`text-lg ${currentMuted} max-w-2xl`}>
-            Récompenses et certifications témoignant de mon engagement dans l'excellence technique et l'innovation
-          </p>
-        </div>
-
-        {/* Awards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {awards.map((award, idx) => {
-            const Icon = award.icon
-            return (
-              <div
-                key={idx}
-                className={`group relative rounded-3xl border p-8 transition-all duration-300 overflow-hidden flex flex-col ${
-                  isDark
-                    ? "bg-slate-900/50 border-slate-800 hover:border-slate-700 hover:shadow-lg"
-                    : "bg-slate-100/50 border-slate-300 hover:border-slate-400 hover:shadow-lg"
-                }`}
-                style={{ animation: `slide-in-up 0.5s ease-out ${idx * 0.1}s backwards` }}
-              >
-                {/* Glow */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                  style={{ backgroundColor: award.color }}
-                ></div>
-
-                <div className="relative space-y-4 flex-1">
-                  {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <div
-                      className="p-3 rounded-xl text-white"
-                      style={{ backgroundColor: award.color }}
-                    >
-                      <Icon className="w-8 h-8" />
-                    </div>
-                    <span
-                      className="text-xs font-bold px-3 py-1.5 rounded-full text-white"
-                      style={{
-                        backgroundColor: `${award.color}40`,
-                        color: award.color,
-                      }}
-                    >
-                      {award.date}
-                    </span>
-                  </div>
-
-                  {/* Content */}
-                  <div>
-                    <h3 className={`text-2xl font-bold mb-2 ${currentText}`}>
-                      {award.title}
-                    </h3>
-                    <p className="font-semibold text-lg mb-4" style={{ color: award.color }}>
-                      {award.description}
-                    </p>
-                  </div>
-
-                  {/* Details */}
-                  <ul className="space-y-2 pt-4 border-t" style={{ borderColor: `${award.color}30` }}>
-                    {award.details.map((detail, i) => (
-                      <li key={i} className={`text-sm flex items-start gap-3 ${currentMuted}`}>
-                        <span
-                          className="font-bold mt-1 flex-shrink-0"
-                          style={{ color: award.color }}
-                        >
-                          ✓
-                        </span>
-                        <span>{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Certifications Section */}
-        <div className={`pt-12 border-t ${currentBorder}`}>
-          <div className="mb-8 space-y-2">
-            <h3 className={`text-3xl font-bold ${currentText}`}>Certifications</h3>
-            <p className={`${currentMuted}`}>
-              Formations professionnelles reconnues internationalement
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {certifications.map((cert, idx) => (
-              <div
-                key={idx}
-                className={`group relative p-6 rounded-2xl border transition-all duration-300 ${
-                  isDark
-                    ? "bg-slate-900/50 border-slate-800 hover:border-blue-600 hover:shadow-lg hover:shadow-blue-600/10"
-                    : "bg-slate-100/50 border-slate-300 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-600/10"
-                }`}
-                style={{ animation: `slide-in-up 0.5s ease-out ${(awards.length + idx) * 0.05}s backwards` }}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl group-hover:scale-110 transition-transform flex-shrink-0">
-                    {cert.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-semibold ${currentText} text-sm leading-tight`}>
-                      {cert.name}
-                    </p>
-                    <div className={`flex items-center gap-1 text-xs ${currentMuted} mt-2`}>
-                      <span className="font-bold text-blue-600">•</span>
-                      <span>{cert.issuer}</span>
-                      <span className="font-bold text-blue-600">•</span>
-                      <span>{cert.year}</span>
-                    </div>
-                  </div>
-                  <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
-                </div>
-              </div>
+        {firsts.length > 0 ? (
+          <ol className="grid gap-5 md:grid-cols-2">
+            {firsts.map(({ a, r }, i) => (
+              <FirstPrize key={`${a.title}-${i}`} award={a} rank={r} index={i} />
             ))}
-          </div>
-        </div>
+          </ol>
+        ) : null}
 
-        {/* Summary Stats */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-3 gap-6">
-          {[
-            { label: "Prix Remportés", value: "3+", icon: "🏆" },
-            { label: "Certifications", value: "5", icon: "📜" },
-            { label: "Reconnaissance", value: "100%", icon: "⭐" },
-          ].map((stat, idx) => (
-            <div
-              key={idx}
-              className={`p-6 rounded-2xl border text-center transition-all duration-300 group ${
-                isDark
-                  ? "bg-slate-900/50 border-slate-800 hover:border-blue-600"
-                  : "bg-slate-100/50 border-slate-300 hover:border-blue-500"
-              }`}
-            >
-              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">
-                {stat.icon}
-              </div>
-              <p className="text-3xl font-bold text-blue-600 mb-1">{stat.value}</p>
-              <p className={`text-sm ${currentMuted}`}>{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+        {others.length > 0 ? (
+          <ol className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {others.map(({ a, r }, i) => (
+              <Prize key={`${a.title}-${i}`} award={a} rank={r} color={CARD_COLORS[i % CARD_COLORS.length]} index={i} />
+            ))}
+          </ol>
+        ) : null}
+
+        {certifications.length > 0 ? (
+          <div className="mt-24">
+            <h3 data-reveal="rise" className="font-display text-[clamp(2rem,4vw,3.5rem)] font-extrabold leading-[0.95] tracking-[-0.03em]">
+              Certifications
+            </h3>
+            <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {certifications.map((c, i) => (
+                <li
+                  key={`${c.name}-${i}`}
+                  data-reveal="rise"
+                  style={{ "--d": `${i * 60}ms` } as React.CSSProperties}
+                  className={cn(
+                    "relative flex flex-col rounded-[22px] bg-blanc p-5 text-noir shadow-[var(--lift)] transition-[transform,box-shadow] duration-300 ease-[var(--ease-out-expo)]",
+                    c.certificateUrl && "cursor-pointer hover:-translate-y-1 hover:shadow-[var(--lift-hi)]",
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className={cn("sticker px-3 py-1.5 text-[0.875rem]", `s-${CARD_COLORS[i % CARD_COLORS.length]}`)}
+                      style={{ "--cut": "3px", "--r": "-3deg" } as React.CSSProperties}
+                    >
+                      {clean(c.provider)}
+                    </span>
+                    <span className="text-[0.875rem] font-bold tabular-nums">{clean(c.year)}</span>
+                  </div>
+                  <p className="mt-4 font-display text-[1.25rem] font-extrabold leading-tight tracking-[-0.01em]">{clean(c.name)}</p>
+                  {c.skills?.length ? <p className="mt-1.5 text-[0.875rem] font-semibold text-gris">{c.skills.map(clean).join(" · ")}</p> : null}
+                  <p className="mt-auto flex gap-4 pt-4 text-[1rem] font-bold">
+                    {c.certificateUrl ? (
+                      // Le bouton couvre toute la carte : un clic n'importe où ouvre l'aperçu.
+                      <button
+                        type="button"
+                        onClick={() => setPreview(c)}
+                        className="cursor-pointer underline decoration-orange decoration-[3px] underline-offset-4 after:absolute after:inset-0 after:rounded-[22px] after:content-[''] hover:decoration-noir"
+                      >
+                        Voir le certificat
+                      </button>
+                    ) : null}
+                    {c.verificationUrl ? (
+                      <a href={c.verificationUrl} target="_blank" rel="noopener noreferrer" className="relative z-10 underline decoration-bleu decoration-[3px] underline-offset-4 hover:decoration-noir">
+                        Vérifier ↗
+                      </a>
+                    ) : null}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </Container>
+
+      <CertificatePreview cert={preview} onClose={() => setPreview(null)} />
     </section>
+  )
+}
+
+type Rank = ReturnType<typeof splitRank>
+
+/** Premier prix : le dégradé qui dérive doucement, reflet au pointeur, confettis au clic. */
+function FirstPrize({ award: a, rank: r, index }: { award: AwardRow; rank: Rank; index: number }) {
+  const holo = useHolo<HTMLButtonElement>(4)
+  return (
+    <li data-reveal="rise" style={{ "--d": `${index * 120}ms` } as React.CSSProperties}>
+      <button
+        ref={holo}
+        type="button"
+        onClick={(e) => burst(e.clientX, e.clientY)}
+        className="holo holo-clean holo-idle block h-full w-full cursor-pointer rounded-[24px] p-6 text-left shadow-[var(--lift-hi)] transition-transform duration-300 ease-out md:p-7"
+        aria-label={`${clean(a.title)}, ${clean(a.date)}. Lancer les confettis`}
+      >
+        <span className="flex items-start justify-between gap-4">
+          <Rank n={1} suffix="er" className="text-[clamp(3.75rem,6vw,5rem)]" />
+          <span className="rounded-full bg-noir px-3 py-1.5 text-[0.875rem] font-bold text-blanc tabular-nums">{clean(a.date)}</span>
+        </span>
+        <span className="mt-5 block font-display text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em]">
+          {r.kind} · {r.rest}
+        </span>
+        <span className="mt-2 block max-w-[48ch] text-[1rem] font-semibold leading-relaxed">{clean(a.description)}</span>
+        {a.details?.length ? (
+          <span className="mt-4 flex flex-wrap gap-2">
+            {a.details.map((d) => (
+              <span key={d} className="rounded-full bg-blanc/75 px-3 py-1 text-[0.8125rem] font-bold">
+                {clean(d)}
+              </span>
+            ))}
+          </span>
+        ) : null}
+      </button>
+    </li>
+  )
+}
+
+/** Autres prix : un aplat de couleur, droit et compact, qui prend la lumière au pointeur. */
+function Prize({ award: a, rank: r, color, index }: { award: AwardRow; rank: Rank; color: Accent; index: number }) {
+  const card = useHolo<HTMLDivElement>(4)
+  return (
+    <li data-reveal="rise" style={{ "--d": `${(index % 3) * 100}ms` } as React.CSSProperties}>
+      <div
+        ref={card}
+        className={cn("shine relative h-full overflow-hidden rounded-[22px] p-6 shadow-[var(--lift)] transition-transform duration-300 ease-out", `field-${color}`)}
+      >
+        <div className="flex items-start justify-between gap-4">
+          {r.n ? <Rank n={r.n} suffix={r.suffix} className="text-[3.25rem]" /> : <StarIcon className="size-12" />}
+          <p className="text-soft pt-1 text-[0.875rem] font-bold tabular-nums">{clean(a.date)}</p>
+        </div>
+        <h3 className="mt-5 font-display text-[1.25rem] font-extrabold leading-snug tracking-[-0.01em]">
+          {r.n ? `${r.kind} · ${r.rest}` : r.rest}
+        </h3>
+        <p className="text-soft mt-2 text-[0.9375rem] font-medium leading-relaxed">{clean(a.description)}</p>
+        {a.details?.length ? (
+          <ul className="mt-3 space-y-1">
+            {a.details.map((d) => (
+              <li key={d} className="grid grid-cols-[1.1rem_1fr] text-[0.875rem] font-semibold">
+                <span aria-hidden="true">→</span>
+                {clean(d)}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    </li>
+  )
+}
+
+/** Rang : le chiffre énorme, le suffixe collé en haut à droite. */
+function Rank({ n, suffix, className }: { n: number; suffix: string; className?: string }) {
+  return (
+    <span className={cn("block font-display font-extrabold leading-[0.8] tracking-[-0.05em]", className)}>
+      {n}
+      {/* Le haut des lettres du suffixe s'aligne sur le haut du chiffre. */}
+      <span className="ml-[0.08em] align-[1.3em] text-[0.36em] tracking-normal">{suffix}</span>
+    </span>
   )
 }

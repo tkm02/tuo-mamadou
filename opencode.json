@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "my-provider": {
+      "options": {
+        "apiKey": "sk-A40rLh7Jj2fexLwNdcEWfw",
+        "baseURL": "https://llmproxy.ai.orange"
+      }
+    }
+  }
+}

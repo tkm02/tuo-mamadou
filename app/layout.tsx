@@ -1,49 +1,65 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import type { Metadata, Viewport } from "next"
+import { Bricolage_Grotesque, Figtree } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { normalizeTheme, themeCss, themeFallback, type ThemePalette } from "@/lib/theme"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  axes: ["opsz", "wdth"],
+  variable: "--font-display",
+})
+const sans = Figtree({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
-  title: "Mamadou Tuo - Full Stack Developer & IoT Specialist",
+  title: "Kolotioloma Mamadou TUO — Développeur Full Stack & IA · Abidjan",
   description:
-    "Professional portfolio showcasing full stack development, IoT systems, and innovative solutions in web, mobile, and embedded systems",
+    "Ingénieur logiciel à Abidjan, développeur full stack et automatisation IA (n8n, LLM, RAG). Neuf fois primé depuis 2022 : 1er prix ICESCO 2025, 1er prix Moov Application 2025. Disponible pour des missions freelance.",
   generator: "portfolio.app",
   icons: {
-    icon: [
-      {
-        url: "/logo.png",
-        media: "(prefers-color-scheme: light)",
-      },
-    ],
+    icon: [{ url: "/logo.png" }],
     apple: "/logo.png",
   },
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * The root layout component that wraps the entire app.
- * It sets the HTML language, suppresses hydration warnings, and sets the font family and background color.
- * It also wraps the app with the theme provider and analytics.
- * @param {{ children: React.ReactNode }} props - The props object.
- * @param {React.ReactNode} props.children - The children to render.
- */
-/*******  acd2b870-ae13-4460-acda-bc40fc727a21  *******/
-export default function RootLayout({
+export const viewport: Viewport = {
+  themeColor: themeFallback.blanc,
+}
+
+/** Palette réglée dans le backoffice, lue côté serveur pour éviter tout flash de couleur. */
+async function loadTheme(): Promise<ThemePalette> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) return themeFallback
+  try {
+    const res = await fetch(`${url}/rest/v1/site_content?key=eq.theme&select=value`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      next: { revalidate: 60, tags: ["theme"] },
+    })
+    if (!res.ok) return themeFallback
+    const rows = (await res.json()) as { value?: Record<string, unknown> }[]
+    return normalizeTheme(rows[0]?.value)
+  } catch {
+    return themeFallback
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const theme = await loadTheme()
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className={`font-sans antialiased bg-background text-foreground`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
-        </ThemeProvider>
+    <html lang="fr" className={`${display.variable} ${sans.variable}`} suppressHydrationWarning>
+      <head>
+        <style id="theme-vars" dangerouslySetInnerHTML={{ __html: themeCss(theme) }} />
+        {/* Les animations d'entrée ne masquent le contenu que si le JS tourne. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
+      <body className="font-sans antialiased">
+        {children}
         <Analytics />
       </body>
     </html>
