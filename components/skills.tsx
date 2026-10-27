@@ -4,6 +4,7 @@ import type React from "react"
 import { useMemo } from "react"
 import { Container, SectionHead, accentAt, tiltOf, type Accent } from "@/components/kit"
 import { useTable } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import {
   experiencesFallback,
   skillCategoriesFallback,
@@ -31,6 +32,7 @@ type Sheet = { title: string; description: string; color: Accent; skills: Skill[
 const SHEET_COLORS: Accent[] = ["orange", "jaune", "sapin", "noir", "vert"]
 
 export default function Skills() {
+  const t = useT()
   const categories = useTable<SkillCategoryRow>("skill_categories", skillCategoriesFallback)
   const tools = useTable<ToolRow>("tools", toolsFallback)
   const experiences = useTable<ExperienceRow>("experiences", experiencesFallback)
@@ -49,20 +51,28 @@ export default function Skills() {
   }, [categories, experiences])
 
   const count = sheets.reduce((n, s) => n + s.skills.length, 0)
+  const otherCategory = t("skills.otherCategory")
   const toolGroups = useMemo(() => {
     const groups = new Map<string, string[]>()
-    for (const t of tools) {
-      const k = clean(t.category) || "Autres"
-      groups.set(k, [...(groups.get(k) ?? []), clean(t.name)])
+    for (const tool of tools) {
+      const k = clean(tool.category) || otherCategory
+      groups.set(k, [...(groups.get(k) ?? []), clean(tool.name)])
     }
     return [...groups.entries()]
-  }, [tools])
+  }, [tools, otherCategory])
 
   return (
     <section id="skills" aria-labelledby="skills-title" className="field-bleu py-[clamp(5rem,11vw,9rem)]">
       <Container>
-        <SectionHead id="skills" title="La boîte à" mark="outils" markColor="orange" data={`${count} technos`} dataColor="jaune">
-          Une planche par domaine. Les stickers marqués d&apos;un chiffre ont servi sur plusieurs missions réelles.
+        <SectionHead
+          id="skills"
+          title={t("skills.title")}
+          mark={t("skills.mark")}
+          markColor="orange"
+          data={t("skills.data", { count })}
+          dataColor="jaune"
+        >
+          {t("skills.lede")}
         </SectionHead>
 
         <ul className="columns-1 gap-6 md:columns-2 xl:columns-3">
@@ -109,11 +119,11 @@ export default function Skills() {
                       {hub ? (
                         <span
                           className="grid size-6 place-items-center rounded-full bg-blanc text-[0.875rem] text-noir"
-                          title={`Utilisé sur ${s.uses} missions`}
+                          title={t("skills.usedOn", { count: s.uses })}
                         >
-                          <span className="sr-only">, utilisé sur </span>
+                          <span className="sr-only">{t("skills.usedOnSrBefore")}</span>
                           {s.uses}
-                          <span className="sr-only"> missions</span>
+                          <span className="sr-only">{t("skills.usedOnSrAfter")}</span>
                         </span>
                       ) : null}
                     </li>
@@ -125,8 +135,10 @@ export default function Skills() {
 
           {toolGroups.length > 0 ? (
             <li data-reveal="rise" className="mb-6 break-inside-avoid rounded-[28px] bg-noir p-6 text-blanc shadow-[var(--lift-hi)] md:p-7">
-              <h3 className="font-display text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em]">L&apos;atelier</h3>
-              <p className="mt-1 text-[1rem] font-medium opacity-75">{tools.length} outils du quotidien</p>
+              <h3 className="font-display text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em]">
+                {t("skills.workshop")}
+              </h3>
+              <p className="mt-1 text-[1rem] font-medium opacity-75">{t("skills.toolsCount", { count: tools.length })}</p>
               <dl className="mt-5 space-y-4">
                 {toolGroups.map(([cat, names], i) => (
                   <div key={cat}>

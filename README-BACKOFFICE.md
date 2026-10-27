@@ -71,6 +71,24 @@ La navigation reprend les noms des sections du site.
 - Le site public lit les données dans Supabase ; **tant que la base est vide ou non configurée, il affiche le contenu d'origine** (défini dans `lib/fallback-data.ts`). Le site ne peut donc jamais être « cassé » par la base.
 - La sécurité est assurée par les règles RLS de Postgres : tout le monde peut **lire** le contenu, mais seul un utilisateur **connecté** (toi) peut écrire. Le formulaire de contact peut uniquement **insérer** des messages ; leur lecture est réservée à toi.
 
+## Version anglaise du site
+
+Le site s'affiche en français ou en anglais, au choix du visiteur : le bouton **FR / EN** est dans la barre de navigation. Le choix est mémorisé dans le navigateur et le site revient en français pour un nouveau visiteur.
+
+Il n'y a **pas de champs anglais dans le backoffice**. L'anglais est produit par une table de correspondance : `lib/i18n/content-en.ts` associe une phrase française exacte à sa traduction.
+
+Conséquence à connaître : **quand tu ajoutes ou modifies un texte dans le backoffice, il reste en français côté anglais tant que sa traduction n'est pas ajoutée à cette table.** Rien ne casse — la phrase s'affiche simplement en français. Pour la traduire, ajoute une ligne dans `lib/i18n/content-en.ts` :
+
+```ts
+"Ma nouvelle phrase en français": "My new sentence in English",
+```
+
+La phrase française doit être copiée **à l'identique** (accents, ponctuation, majuscules), sinon la correspondance ne se fait pas.
+
+Les textes de l'interface, eux (menu, boutons, titres de section, libellés de formulaire), vivent dans `lib/i18n/ui.ts` et sont déjà traduits ; ils ne dépendent pas du backoffice.
+
+Restent volontairement en français dans les deux langues : les noms propres (écoles, entreprises, trophées) et le titre de l'onglet du navigateur.
+
 ## Fichiers ajoutés
 
 - `supabase/schema.sql` — schéma de la base (à exécuter une fois)
@@ -80,5 +98,8 @@ La navigation reprend les noms des sections du site.
 - `lib/admin/resources.ts` — configuration des collections du backoffice (ajoute un champ ici pour l'avoir dans le formulaire)
 - `lib/admin/content-sections.ts` — configuration des sections fixes (Accueil, À propos, Contact, Réseaux)
 - `lib/admin/health.ts` — règles du poste de contrôle
+- `lib/i18n/ui.ts` — textes de l'interface en français et en anglais
+- `lib/i18n/content-en.ts` — traduction anglaise du contenu éditorial
+- `lib/i18n/context.tsx` — langue courante du site (bouton FR / EN)
 - `components/admin/` — composants du backoffice (formulaires, uploads, CRUD)
 - `app/admin/` — pages du backoffice (login, dashboard, contenu, sections, messages)

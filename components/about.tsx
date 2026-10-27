@@ -4,10 +4,12 @@ import type React from "react"
 import { useState } from "react"
 import { Container, Sticker, accentAt, tiltOf } from "@/components/kit"
 import { useSiteContent } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import { aboutFallback } from "@/lib/fallback-data"
 import { clean, cn } from "@/lib/utils"
 
 export default function About() {
+  const t = useT()
   const about = useSiteContent("about", aboutFallback)
   const tabs = about.tabs ?? []
   const roles = clean(about.leadershipText)
@@ -27,7 +29,7 @@ export default function About() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={about.profileImage || "/tuo/portrait-kente.jpg"}
-                  alt={`Portrait de ${clean(about.name)}`}
+                  alt={t("about.portraitAlt", { name: clean(about.name) })}
                   className="aspect-[4/5] w-full object-cover object-[50%_30%]"
                   loading="lazy"
                 />
@@ -41,7 +43,7 @@ export default function About() {
             </figure>
 
             {roles.length > 0 ? (
-              <ul className="mt-16 flex flex-wrap gap-x-3 gap-y-4" aria-label="Engagements">
+              <ul className="mt-16 flex flex-wrap gap-x-3 gap-y-4" aria-label={t("about.commitments")}>
                 {roles.map((r, i) => (
                   <Sticker
                     as="li"
@@ -71,7 +73,7 @@ export default function About() {
               ) : null}
               {about.cvUrl ? (
                 <a href={about.cvUrl} download className="sticker sticker-peel s-orange px-4 py-2.5 text-[1rem]" style={{ "--cut": "3px" } as React.CSSProperties}>
-                  CV (PDF) ↓
+                  {t("about.cv")} ↓
                 </a>
               ) : null}
             </p>
@@ -98,7 +100,7 @@ export default function About() {
             <div className="mt-12">
               <div
                 role="tablist"
-                aria-label="À propos"
+                aria-label={t("about.tablist")}
                 className="flex flex-wrap gap-3"
                 onKeyDown={(e) => {
                   if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return

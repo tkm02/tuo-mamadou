@@ -3,6 +3,7 @@
 import type React from "react"
 import { Arrow, Container, PillLink } from "@/components/kit"
 import { useSiteContent, useTable } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import { aboutFallback, experiencesFallback, heroFallback, type ExperienceRow } from "@/lib/fallback-data"
 import { clean, isOngoing } from "@/lib/utils"
 
@@ -12,6 +13,7 @@ import { clean, isOngoing } from "@/lib/utils"
  * commencent plus bas.
  */
 export default function Hero() {
+  const t = useT()
   const hero = useSiteContent("hero", heroFallback)
   const about = useSiteContent("about", aboutFallback)
   const experiences = useTable<ExperienceRow>("experiences", experiencesFallback)
@@ -60,14 +62,14 @@ export default function Hero() {
 
           <div data-reveal="rise" style={{ "--d": "280ms" } as React.CSSProperties} className="mt-10 flex flex-col gap-3 sm:flex-row">
             <PillLink href="#contact">
-              Me contacter <Arrow />
+              {t("nav.contactCta")} <Arrow />
             </PillLink>
             <a
               href={about.cvUrl}
               download
               className="inline-flex items-center justify-center gap-3 rounded-full border-2 border-noir px-7 py-4 font-display text-[1.0625rem] font-extrabold transition-colors duration-300 hover:bg-noir hover:text-blanc"
             >
-              Télécharger le CV <span aria-hidden="true">↓</span>
+              {t("hero.cv")} <span aria-hidden="true">↓</span>
             </a>
           </div>
 
@@ -95,13 +97,13 @@ export default function Hero() {
         <figure className="relative lg:col-span-5">
           <div data-reveal="wipe" className="overflow-hidden rounded-[28px] bg-papier">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} alt={`Portrait de ${full}`} className="aspect-[4/5] w-full object-cover object-[52%_30%]" />
+            <img src={photo} alt={t("hero.portraitAlt", { name: full })} className="aspect-[4/5] w-full object-cover object-[52%_30%]" />
           </div>
           {current ? (
             <figcaption className="absolute bottom-5 left-5 right-5 flex items-center gap-2.5 rounded-full bg-blanc px-4 py-3 text-[0.875rem] font-semibold shadow-[var(--lift)] sm:right-auto">
               <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-vert" />
               <span>
-                En poste chez <strong className="font-extrabold">{clean(current.company)}</strong>
+                {t("hero.currentlyAt")} <strong className="font-extrabold">{clean(current.company)}</strong>
               </span>
             </figcaption>
           ) : null}

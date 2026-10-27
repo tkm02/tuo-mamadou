@@ -12,6 +12,7 @@ import Contact from "@/components/contact"
 import Footer from "@/components/footer"
 import { Tape } from "@/components/kit"
 import { MotionRoot } from "@/components/motion"
+import { LanguageProvider, useLanguage } from "@/lib/i18n/context"
 import { useSiteContent } from "@/lib/use-portfolio"
 import { heroFallback } from "@/lib/fallback-data"
 import { clean } from "@/lib/utils"
@@ -27,9 +28,19 @@ function Crossing({ items, top, under }: { items: string[]; top: "noir" | "jaune
 }
 
 export default function Home() {
+  return (
+    <LanguageProvider>
+      <Portfolio />
+    </LanguageProvider>
+  )
+}
+
+/** Dans le fournisseur de langue : tout le contenu lit la langue courante. */
+function Portfolio() {
+  const { t } = useLanguage()
   const hero = useSiteContent("hero", heroFallback)
   const tape = (hero.tape ?? heroFallback.tape).map(clean).filter(Boolean)
-  const freelance = [clean(hero.availableBadge), "Me contacter", clean(hero.title)].filter(Boolean)
+  const freelance = [clean(hero.availableBadge), t("nav.contactCta"), clean(hero.title)].filter(Boolean)
 
   return (
     <>

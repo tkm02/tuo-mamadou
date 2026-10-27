@@ -5,6 +5,7 @@ import { useRef, useState } from "react"
 import { Arrow, Container, Sticker } from "@/components/kit"
 import { burst } from "@/components/motion"
 import { useSiteContent } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import { aboutFallback, contactFallback, socialsFallback } from "@/lib/fallback-data"
 import { getSupabase } from "@/lib/supabase/client"
 import { clean } from "@/lib/utils"
@@ -12,6 +13,7 @@ import { clean } from "@/lib/utils"
 type Status = "idle" | "sending" | "success" | "error"
 
 export default function Contact() {
+  const t = useT()
   const contact = useSiteContent("contact", contactFallback)
   const socials = useSiteContent("socials", socialsFallback)
   const about = useSiteContent("about", aboutFallback)
@@ -75,14 +77,13 @@ export default function Contact() {
             data-reveal="rise"
             className="font-display text-[clamp(2.75rem,7vw,6rem)] font-extrabold leading-[0.9] tracking-[-0.03em]"
           >
-            Votre projet,{" "}
+            {t("contact.titleLead")}{" "}
             <span className="marker" style={{ "--mk": "var(--blanc)" } as React.CSSProperties}>
-              mon prochain sticker&nbsp;?
+              {t("contact.mark")}
             </span>
           </h2>
           <p data-reveal="rise" style={{ "--d": "120ms" } as React.CSSProperties} className="text-soft mt-7 max-w-[46ch] text-[1.25rem] font-medium leading-[1.45]">
-            Une application à construire, un processus à automatiser par l&apos;IA&nbsp;? Je suis disponible pour des
-            missions freelance. Écrivez-moi, appelez-moi, ou laissez un message ici.
+            {t("contact.lede")}
           </p>
 
           <a
@@ -134,18 +135,23 @@ export default function Contact() {
           aria-describedby="form-status"
         >
           <p className="font-display text-[clamp(1.5rem,2.4vw,2rem)] font-extrabold leading-tight tracking-[-0.02em]">
-            Laissez un message
+            {t("contact.formTitle")}
           </p>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <Field label="Nom" name="name" autoComplete="name" required />
-            <Field label="Email" name="email" type="email" autoComplete="email" required />
+            <Field label={t("contact.name")} name="name" autoComplete="name" required />
+            <Field label={t("contact.email")} name="email" type="email" autoComplete="email" required />
           </div>
           <div className="mt-5">
-            <Field label="Objet" name="subject" required placeholder="Mission freelance, automatisation IA, rencontre…" />
+            <Field
+              label={t("contact.subject")}
+              name="subject"
+              required
+              placeholder={t("contact.subjectPlaceholder")}
+            />
           </div>
           <div className="mt-5">
             <label htmlFor="message" className="text-[1rem] font-bold">
-              Message
+              {t("contact.message")}
             </label>
             <textarea
               id="message"
@@ -164,17 +170,17 @@ export default function Contact() {
               disabled={status === "sending"}
               className="group inline-flex items-center justify-center gap-3 rounded-full bg-noir px-7 py-[1.1rem] font-display text-[1.0625rem] font-extrabold text-blanc shadow-[var(--lift)] transition-transform duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"
             >
-              {status === "sending" ? "Envoi en cours…" : "Envoyer le message"}
+              {status === "sending" ? t("contact.sending") : t("contact.send")}
               {status === "sending" ? null : <Arrow />}
             </button>
             <p id="form-status" role="status" aria-live="polite" className="text-[1rem]">
               {status === "success" ? (
                 <span className="sticker s-vert px-4 py-2.5 text-[1rem]" style={{ "--r": "-3deg", "--cut": "3px" } as React.CSSProperties} data-reveal="slap">
-                  Message reçu. Je reviens vers vous très vite.
+                  {t("contact.success")}
                 </span>
               ) : status === "error" ? (
                 <span className="font-semibold">
-                  L&apos;envoi a échoué. Réessayez, ou écrivez directement à{" "}
+                  {t("contact.errorBefore")}
                   <a href={`mailto:${contact.email}`} className="font-bold underline decoration-orange decoration-[3px] underline-offset-4">
                     {contact.email}
                   </a>

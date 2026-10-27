@@ -6,17 +6,20 @@ import { Container, FilterChip, SectionHead, Star, accentAt, tiltOf, type Accent
 import { burst } from "@/components/motion"
 import { TrophyStand } from "@/components/trophy"
 import { useTable } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import { projectsFallback, type ProjectRow } from "@/lib/fallback-data"
 import { clean, cn } from "@/lib/utils"
 
 export default function Projects() {
+  const t = useT()
+  const other = t("proj.other")
   const projects = useTable<ProjectRow>("projects", projectsFallback)
   const [filter, setFilter] = useState("all")
 
-  const categories = useMemo(() => [...new Set(projects.map((p) => clean(p.category) || "Autre"))], [projects])
-  const colorOf = (p: ProjectRow): Accent => accentAt(Math.max(0, categories.indexOf(clean(p.category) || "Autre")))
+  const categories = useMemo(() => [...new Set(projects.map((p) => clean(p.category) || other))], [projects, other])
+  const colorOf = (p: ProjectRow): Accent => accentAt(Math.max(0, categories.indexOf(clean(p.category) || other)))
 
-  const list = filter === "all" ? projects : projects.filter((p) => (clean(p.category) || "Autre") === filter)
+  const list = filter === "all" ? projects : projects.filter((p) => (clean(p.category) || other) === filter)
   const [featured, ...rest] = list
   const awarded = projects.filter((p) => p.award).length
 
@@ -25,20 +28,20 @@ export default function Projects() {
       <Container>
         <SectionHead
           id="projects"
-          title="Projets"
-          mark="livrés"
+          title={t("proj.title")}
+          mark={t("proj.mark")}
           markColor="jaune"
-          data={`${projects.length} projets${awarded ? ` · ${awarded} primés` : ""}`}
+          data={awarded ? t("proj.dataAwarded", { count: projects.length, awarded }) : t("proj.data", { count: projects.length })}
           dataColor="jaune"
         />
 
         <div
           className="rail -mx-[clamp(1rem,4vw,3rem)] mb-14 flex gap-3 overflow-x-auto px-[clamp(1rem,4vw,3rem)] py-2 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0"
           role="group"
-          aria-label="Filtrer les projets"
+          aria-label={t("proj.filterAria")}
         >
           <FilterChip active={filter === "all"} onClick={() => setFilter("all")} count={projects.length}>
-            Tout
+            {t("proj.all")}
           </FilterChip>
           {categories.map((c, i) => (
             <FilterChip
@@ -46,7 +49,7 @@ export default function Projects() {
               active={filter === c}
               onClick={() => setFilter(c)}
               color={accentAt(i)}
-              count={projects.filter((p) => (clean(p.category) || "Autre") === c).length}
+              count={projects.filter((p) => (clean(p.category) || other) === c).length}
             >
               {c}
             </FilterChip>
@@ -56,7 +59,7 @@ export default function Projects() {
         {featured ? (
           <ProjectCase key={`f-${featured.title}`} project={featured} color={colorOf(featured)} featured />
         ) : (
-          <p className="text-[1.25rem] font-semibold">Aucun projet dans cette catégorie.</p>
+          <p className="text-[1.25rem] font-semibold">{t("proj.empty")}</p>
         )}
 
         {rest.length > 0 ? (
@@ -74,6 +77,7 @@ export default function Projects() {
 }
 
 function ProjectCase({ project: p, color, featured = false }: { project: ProjectRow; color: Accent; featured?: boolean }) {
+  const t = useT()
   const tech = (p.technologies ?? []).map(clean).filter(Boolean)
   const tilt = tiltOf(p.title, featured ? 1.5 : 2.5)
   return (
@@ -91,7 +95,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={p.image}
-              alt={`Capture du projet ${clean(p.title)}`}
+              alt={t("proj.imageAlt", { title: clean(p.title) })}
               loading="lazy"
               className="aspect-[16/10] w-full object-cover object-top"
             />
@@ -106,7 +110,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
             onClick={(e) => burst(e.clientX, e.clientY)}
             className="sticker sticker-peel s-noir absolute -right-3 -top-5 cursor-pointer px-4 py-2.5 text-[1rem] md:-right-5"
             style={{ "--r": "6deg", "--cut": "4px" } as React.CSSProperties}
-            aria-label={`${clean(p.awardLabel)} : lancer les confettis`}
+            aria-label={t("proj.confetti", { label: clean(p.awardLabel) })}
           >
             <Star className="size-4 text-jaune" />
             {clean(p.awardLabel)}
@@ -117,7 +121,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
       <div data-reveal="rise" className={cn(featured ? "lg:col-span-5" : "mt-7")}>
         <p className="flex flex-wrap items-center gap-3 text-[0.875rem] font-bold">
           <span className={cn("sticker px-3 py-1.5 text-[0.875rem]", `s-${color}`)} style={{ "--cut": "3px" } as React.CSSProperties}>
-            {clean(p.category) || "Projet"}
+            {clean(p.category) || t("proj.default")}
           </span>
           <span className="tabular-nums">{clean(p.year)}</span>
           {p.role ? <span className="text-gris">· {clean(p.role)}</span> : null}
@@ -132,7 +136,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
         </h3>
         <p className="mt-4 max-w-[60ch] text-[1.0625rem] leading-relaxed">{clean(p.description)}</p>
         {tech.length > 0 ? (
-          <ul className="mt-5 flex flex-wrap gap-2" aria-label="Technologies">
+          <ul className="mt-5 flex flex-wrap gap-2" aria-label={t("exp.technologies")}>
             {tech.slice(0, featured ? 14 : 8).map((t) => (
               <li key={t} className="rounded-full border-2 border-noir px-3 py-1 text-[0.875rem] font-bold">
                 {t}
@@ -149,7 +153,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
                 rel="noopener noreferrer"
                 className="rounded-full bg-noir px-5 py-3 font-display text-[1rem] font-extrabold text-blanc transition-transform duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5"
               >
-                Voir le projet ↗
+                {t("proj.view")}
               </a>
             ) : null}
             {p.githubUrl ? (
@@ -159,7 +163,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
                 rel="noopener noreferrer"
                 className="rounded-full border-2 border-noir px-5 py-2.5 font-display text-[1rem] font-extrabold transition-transform duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5"
               >
-                Code source ↗
+                {t("proj.code")}
               </a>
             ) : null}
           </div>
@@ -167,7 +171,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
         {p.trophy ? (
           <TrophyStand
             src={p.trophy}
-            title={clean(p.awardLabel) || "Projet primé"}
+            title={clean(p.awardLabel) || t("proj.awarded")}
             caption={clean(p.year)}
             compact
             className="mt-8 [&_.trophy-stage]:[--stage:var(--blanc)] [&_.trophy-stage]:shadow-[var(--lift)]"
@@ -180,6 +184,7 @@ function ProjectCase({ project: p, color, featured = false }: { project: Project
 
 /** Sans capture : une planche de stickers de la pile technique, jamais un rectangle gris. */
 function StackSheet({ tech, role }: { tech: string[]; role: string }) {
+  const t = useT()
   const shown = tech.slice(0, 9)
   return (
     <div className="flex aspect-[16/10] w-full flex-wrap content-center items-center justify-center gap-x-4 gap-y-5 p-6">
@@ -195,7 +200,7 @@ function StackSheet({ tech, role }: { tech: string[]; role: string }) {
         ))
       ) : (
         <span className="sticker s-noir px-5 py-3 text-[1.25rem]" style={{ "--r": "-4deg" } as React.CSSProperties}>
-          {role || "Projet"}
+          {role || t("proj.default")}
         </span>
       )}
     </div>

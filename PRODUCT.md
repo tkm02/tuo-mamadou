@@ -18,7 +18,7 @@ Title (confirmed 2026-09-29, matches CV of 2026-09-28): "Développeur full stack
 Availability (confirmed): available for freelance missions.
 
 ## Operating Context
-Visitors arrive from a CV, LinkedIn, or an email link, often on mobile. Site content is editable through an admin backoffice (`app/admin`, Supabase `site_content` and collection tables) with fallback data in `lib/fallback-data.ts`. Language: French.
+Visitors arrive from a CV, LinkedIn, or an email link, often on mobile. Site content is editable through an admin backoffice (`app/admin`, Supabase `site_content` and collection tables) with fallback data in `lib/fallback-data.ts`. Languages: French (default) and English, switched by a FR / EN button in the navigation; the choice is kept in `localStorage`. Interface strings live in `lib/i18n/ui.ts`, content is translated by an exact-phrase table in `lib/i18n/content-en.ts`, so a phrase added in the backoffice stays French until it is added there.
 
 ## Capabilities and Constraints
 - Next.js 16 / React 19 / Tailwind v4. Content comes from `useSiteContent` / `useTable` hooks; any redesign must keep reading from these so the backoffice keeps working.

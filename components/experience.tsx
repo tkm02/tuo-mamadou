@@ -6,6 +6,7 @@ import Lightbox from "@/components/lightbox"
 import { Container, FilterChip, SectionHead, Sticker, type Accent } from "@/components/kit"
 import { TrophyStand } from "@/components/trophy"
 import { useTable } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import { educationFallback, experiencesFallback, type EducationRow, type ExperienceRow, type Proof } from "@/lib/fallback-data"
 import { clean, cn, isOngoing } from "@/lib/utils"
 
@@ -20,6 +21,8 @@ function yearSpan(rows: { period?: string; year?: string }[]) {
 }
 
 export default function Experience() {
+  const t = useT()
+  const defaultType = t("exp.defaultType")
   const experiences = useTable<ExperienceRow>("experiences", experiencesFallback)
   const education = useTable<EducationRow>("education", educationFallback)
   const [filter, setFilter] = useState<string>("all")
@@ -27,14 +30,18 @@ export default function Experience() {
   const [proofs, setProofs] = useState<Proof[] | null>(null)
   const [all, setAll] = useState(false)
 
-  const types = useMemo(() => [...new Set(experiences.map((r) => clean(r.type) || "Mission"))], [experiences])
-  const colorOf = (e: ExperienceRow) => TYPE_COLORS[Math.max(0, types.indexOf(clean(e.type) || "Mission")) % TYPE_COLORS.length]
+  const types = useMemo(
+    () => [...new Set(experiences.map((r) => clean(r.type) || defaultType))],
+    [experiences, defaultType],
+  )
+  const colorOf = (e: ExperienceRow) =>
+    TYPE_COLORS[Math.max(0, types.indexOf(clean(e.type) || defaultType)) % TYPE_COLORS.length]
   const leadCount = experiences.filter((e) => LEAD.test(e.role)).length
 
   const matching = experiences
     .map((e, index) => ({ e, index }))
     .filter(({ e }) =>
-      filter === "all" ? true : filter === "lead" ? LEAD.test(e.role) : (clean(e.type) || "Mission") === filter,
+      filter === "all" ? true : filter === "lead" ? LEAD.test(e.role) : (clean(e.type) || defaultType) === filter,
     )
   // La mission affichée à droite reste dans le filtre courant.
   const current = matching.find((m) => m.index === selected) ?? matching[0]
@@ -66,34 +73,34 @@ export default function Experience() {
       <Container>
         <SectionHead
           id="experience"
-          title="Ce que j'ai"
-          mark="mené"
+          title={t("exp.title")}
+          mark={t("exp.mark")}
           markColor="blanc"
-          data={`${experiences.length} missions · ${yearSpan(experiences)}`}
+          data={t("exp.data", { count: experiences.length, span: yearSpan(experiences) })}
           dataColor="noir"
         />
 
         <div
           className="rail -mx-[clamp(1rem,4vw,3rem)] mb-8 flex gap-3 overflow-x-auto px-[clamp(1rem,4vw,3rem)] py-2 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0"
           role="group"
-          aria-label="Filtrer les missions"
+          aria-label={t("exp.filterAria")}
         >
           <FilterChip active={filter === "all"} onClick={() => setFilter("all")} count={experiences.length}>
-            Tout
+            {t("exp.all")}
           </FilterChip>
           {leadCount > 0 ? (
             <FilterChip active={filter === "lead"} onClick={() => setFilter("lead")} count={leadCount}>
-              Pilotage
+              {t("exp.lead")}
             </FilterChip>
           ) : null}
-          {types.map((t) => (
+          {types.map((type) => (
             <FilterChip
-              key={t}
-              active={filter === t}
-              onClick={() => setFilter(t)}
-              count={experiences.filter((e) => (clean(e.type) || "Mission") === t).length}
+              key={type}
+              active={filter === type}
+              onClick={() => setFilter(type)}
+              count={experiences.filter((e) => (clean(e.type) || defaultType) === type).length}
             >
-              {t}
+              {type}
             </FilterChip>
           ))}
         </div>
@@ -103,15 +110,15 @@ export default function Experience() {
           <div>
             <div className="mb-4 flex items-center justify-between gap-4">
               <p className="text-[0.875rem] font-bold tabular-nums" aria-live="polite">
-                Mission {position + 1} / {matching.length}
+                {t("exp.counter", { index: position + 1, total: matching.length })}
               </p>
               <div className="flex gap-2">
-                <StepButton label="Mission précédente" disabled={position <= 0} onClick={() => step(-1)} dir="up" />
-                <StepButton label="Mission suivante" disabled={position >= matching.length - 1} onClick={() => step(1)} dir="down" />
+                <StepButton label={t("exp.prev")} disabled={position <= 0} onClick={() => step(-1)} dir="up" />
+                <StepButton label={t("exp.next")} disabled={position >= matching.length - 1} onClick={() => step(1)} dir="down" />
               </div>
             </div>
           <div ref={listRef} className="rail lg:-m-2 lg:max-h-[min(46rem,calc(100vh-11rem))] lg:overflow-y-auto lg:p-2">
-            <ul className="flex flex-col gap-3" aria-label="Missions">
+            <ul className="flex flex-col gap-3" aria-label={t("exp.listAria")}>
               {matching.map(({ e, index }, k) => {
                 const isOn = current?.index === index
                 return (
@@ -138,13 +145,13 @@ export default function Experience() {
                           {isOngoing(e.period) ? (
                             <span className={cn("flex items-center gap-1.5 font-bold", isOn ? "text-blanc" : "text-noir")}>
                               <span aria-hidden="true" className="live-dot size-2 rounded-full" />
-                              En cours
+                              {t("exp.ongoing")}
                             </span>
                           ) : (
                             <span>{clean(e.duration) || clean(e.period)}</span>
                           )}
                           <span aria-hidden="true">·</span>
-                          <span>{clean(e.type) || "Mission"}</span>
+                          <span>{clean(e.type) || defaultType}</span>
                         </span>
                       </span>
                       <span
@@ -179,7 +186,7 @@ export default function Experience() {
                   className="sticker sticker-peel s-noir cursor-pointer px-6 py-3.5 text-[1rem]"
                   style={{ "--r": "-2deg" } as React.CSSProperties}
                 >
-                  Voir les {hiddenOnPhone} autres missions ↓
+                  {t("exp.showMore", { count: hiddenOnPhone })}
                 </button>
               </div>
             ) : null}
@@ -189,7 +196,7 @@ export default function Experience() {
             {current ? (
               <MissionDetail key={current.index} e={current.e} color={colorOf(current.e)} onProofs={setProofs} />
             ) : (
-              <p className="text-[1.25rem] font-semibold">Aucune mission dans ce filtre.</p>
+              <p className="text-[1.25rem] font-semibold">{t("exp.empty")}</p>
             )}
           </div>
         </div>
@@ -198,7 +205,7 @@ export default function Experience() {
           <div className="mt-24">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h3 data-reveal="rise" className="font-display text-[clamp(2.75rem,7vw,6rem)] font-extrabold leading-[0.9] tracking-[-0.03em]">
-                Formation
+                {t("exp.education")}
               </h3>
               <Sticker color="noir" tilt={3} reveal="slap">
                 {yearSpan(education)}
@@ -238,7 +245,7 @@ export default function Experience() {
         ) : null}
       </Container>
 
-      <Lightbox images={proofs} heading="Preuves de la mission" onClose={() => setProofs(null)} />
+      <Lightbox images={proofs} heading={t("exp.proofsHeading")} onClose={() => setProofs(null)} />
     </section>
   )
 }
@@ -267,6 +274,7 @@ function MissionDetail({
   color: Accent
   onProofs: (p: Proof[]) => void
 }) {
+  const t = useT()
   const ongoing = isOngoing(e.period)
   return (
     <article data-reveal="rise" className="rounded-[28px] bg-blanc p-6 text-noir shadow-[var(--lift-hi)] md:p-9">
@@ -274,12 +282,12 @@ function MissionDetail({
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2">
             <span className={cn("sticker px-3 py-1.5 text-[0.875rem]", `s-${color}`)} style={{ "--cut": "3px" } as React.CSSProperties}>
-              {clean(e.type) || "Mission"}
+              {clean(e.type) || t("exp.defaultType")}
             </span>
             {ongoing ? (
               <span className="flex items-center gap-1.5 text-[0.875rem] font-bold">
                 <span aria-hidden="true" className="live-dot size-2 rounded-full" />
-                En cours
+                {t("exp.ongoing")}
               </span>
             ) : null}
           </p>
@@ -307,7 +315,7 @@ function MissionDetail({
 
       {e.achievements?.length ? (
         <>
-          <p className="mt-7 font-display text-[1.0625rem] font-extrabold">Réalisations clés</p>
+          <p className="mt-7 font-display text-[1.0625rem] font-extrabold">{t("exp.achievements")}</p>
           <ul className="mt-3 space-y-2.5">
             {e.achievements.map((a) => (
               <li key={a} className="grid grid-cols-[1.5rem_1fr] text-[1rem] leading-relaxed">
@@ -323,8 +331,8 @@ function MissionDetail({
 
       {e.technologies?.length ? (
         <>
-          <p className="mt-7 font-display text-[1.0625rem] font-extrabold">Stack technique</p>
-          <ul className="mt-3 flex flex-wrap gap-2" aria-label="Technologies">
+          <p className="mt-7 font-display text-[1.0625rem] font-extrabold">{t("exp.stack")}</p>
+          <ul className="mt-3 flex flex-wrap gap-2" aria-label={t("exp.technologies")}>
             {e.technologies.map((t) => (
               <li key={t} className="rounded-full border-2 border-noir px-3 py-1 text-[0.875rem] font-bold">
                 {clean(t)}
@@ -340,7 +348,7 @@ function MissionDetail({
           onClick={() => onProofs(e.proofs)}
           className="mt-7 rounded-full bg-noir px-5 py-3 font-display text-[1rem] font-extrabold text-blanc transition-transform duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5"
         >
-          Voir les preuves ({e.proofs.length})
+          {t("exp.proofs", { count: e.proofs.length })}
         </button>
       ) : null}
 

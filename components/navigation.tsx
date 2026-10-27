@@ -3,14 +3,16 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { accentAt } from "@/components/kit"
+import { useLanguage } from "@/lib/i18n/context"
+import { LANG_NAMES, LANGS, type UIKey } from "@/lib/i18n/ui"
 import { cn } from "@/lib/utils"
 
-const LINKS = [
-  { label: "Parcours", href: "#experience" },
-  { label: "Projets", href: "#projects" },
-  { label: "Victoires", href: "#awards" },
-  { label: "Outils", href: "#skills" },
-  { label: "Terrain", href: "#gallery" },
+const LINKS: { key: UIKey; href: string }[] = [
+  { key: "nav.experience", href: "#experience" },
+  { key: "nav.projects", href: "#projects" },
+  { key: "nav.awards", href: "#awards" },
+  { key: "nav.skills", href: "#skills" },
+  { key: "nav.gallery", href: "#gallery" },
 ]
 
 export function Wordmark({ className }: { className?: string }) {
@@ -29,7 +31,40 @@ export function Wordmark({ className }: { className?: string }) {
   )
 }
 
+/** Bascule français / anglais : deux moitiés, la langue active en noir plein. */
+export function LangSwitch({ className }: { className?: string }) {
+  const { lang, setLang, t } = useLanguage()
+  return (
+    <div
+      role="group"
+      aria-label={t("nav.lang")}
+      className={cn("flex shrink-0 items-center gap-0.5 rounded-full border-2 border-noir bg-blanc p-0.5", className)}
+    >
+      {LANGS.map((code) => {
+        const on = code === lang
+        return (
+          <button
+            key={code}
+            type="button"
+            onClick={() => setLang(code)}
+            aria-pressed={on}
+            title={t("nav.langTo", { lang: LANG_NAMES[code] })}
+            className={cn(
+              "cursor-pointer rounded-full px-3 py-2 font-display text-[0.875rem] font-extrabold uppercase tracking-[0.04em] transition-colors duration-300",
+              on ? "bg-noir text-blanc" : "text-noir hover:bg-noir/[0.07]",
+            )}
+          >
+            <span aria-hidden="true">{code}</span>
+            <span className="sr-only">{LANG_NAMES[code]}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function Navigation() {
+  const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState<string>("")
@@ -63,15 +98,17 @@ export default function Navigation() {
     return () => window.removeEventListener("keydown", onKey)
   }, [open])
 
+  const menuLinks = [...LINKS, { key: "nav.contact" as UIKey, href: "#contact" }]
+
   return (
-    <nav aria-label="Navigation principale" className="fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-5 md:pt-4">
+    <nav aria-label={t("nav.aria")} className="fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-5 md:pt-4">
       <div
         className={cn(
           "mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-4 rounded-full pl-3 pr-2 transition-[background-color,box-shadow] duration-500 ease-[var(--ease-out-expo)]",
           scrolled && !open ? "bg-blanc shadow-[var(--lift-hi)]" : "bg-transparent",
         )}
       >
-        <a href="#top" aria-label="Retour en haut — Mamadou TUO" className="shrink-0">
+        <a href="#top" aria-label={t("nav.top")} className="shrink-0">
           <Wordmark className="sticker-peel" />
         </a>
 
@@ -89,7 +126,7 @@ export default function Navigation() {
                   )}
                   style={isActive ? ({ "--cut": "3px" } as React.CSSProperties) : undefined}
                 >
-                  {link.label}
+                  {t(link.key)}
                 </a>
               </li>
             )
@@ -97,11 +134,12 @@ export default function Navigation() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <LangSwitch />
           <a
             href="#contact"
             className="hidden rounded-full bg-noir px-5 py-3 font-display text-[1rem] font-extrabold text-blanc transition-transform duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 sm:inline-flex"
           >
-            Me contacter
+            {t("nav.contactCta")}
           </a>
           <button
             type="button"
@@ -110,7 +148,7 @@ export default function Navigation() {
             aria-controls="menu-mobile"
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? "Fermer" : "Menu"}
+            {open ? t("nav.close") : t("nav.menu")}
           </button>
         </div>
       </div>
@@ -121,7 +159,7 @@ export default function Navigation() {
           className="field-orange fixed inset-0 -z-10 overflow-y-auto px-[clamp(1rem,4vw,3rem)] pb-10 pt-28 lg:hidden"
         >
           <ul className="flex flex-col items-start gap-5">
-            {[...LINKS, { label: "Contact", href: "#contact" }].map((link, i) => (
+            {menuLinks.map((link, i) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -130,7 +168,7 @@ export default function Navigation() {
                   className={cn("sticker sticker-peel px-6 py-4 text-[2rem]", `s-${i === 5 ? "noir" : i % 2 ? "blanc" : accentAt(i + 1)}`)}
                   style={{ "--r": `${i % 2 ? 3 : -3}deg`, "--d": `${i * 60}ms` } as React.CSSProperties}
                 >
-                  {link.label}
+                  {t(link.key)}
                 </a>
               </li>
             ))}

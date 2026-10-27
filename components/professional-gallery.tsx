@@ -5,19 +5,23 @@ import { useMemo, useState } from "react"
 import Lightbox, { type LightboxImage } from "@/components/lightbox"
 import { Container, FilterChip, SectionHead, tiltOf, type Accent } from "@/components/kit"
 import { useTable } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
+import type { UIKey } from "@/lib/i18n/ui"
 import { galleryFallback, type GalleryRow } from "@/lib/fallback-data"
 import { clean, cn } from "@/lib/utils"
 
-const LABELS: Record<string, string> = {
-  events: "Événements",
-  team: "Leadership",
-  mentoring: "Mentorat",
+const LABEL_KEYS: Record<string, UIKey> = {
+  events: "gallery.catEvents",
+  team: "gallery.catTeam",
+  mentoring: "gallery.catMentoring",
 }
 const LABEL_COLORS: Accent[] = ["orange", "noir"]
 
 type Open = { images: LightboxImage[]; heading: string; caption: string }
 
 export default function ProfessionalGallery() {
+  const t = useT()
+  const label = (category: string) => (LABEL_KEYS[category] ? t(LABEL_KEYS[category]) : category)
   const items = useTable<GalleryRow>("gallery_items", galleryFallback)
   const [filter, setFilter] = useState("all")
   const [open, setOpen] = useState<Open | null>(null)
@@ -32,22 +36,29 @@ export default function ProfessionalGallery() {
   return (
     <section id="gallery" aria-labelledby="gallery-title" className="field-blanc overflow-hidden py-[clamp(5rem,11vw,9rem)]">
       <Container>
-        <SectionHead id="gallery" title="Sur le" mark="terrain" markColor="orange" data={`${items.length} moments · ${photoCount} photos`} dataColor="orange">
-          Hackathons, soutenances, panels et équipes : les moments où le travail est sorti de l&apos;écran.
+        <SectionHead
+          id="gallery"
+          title={t("gallery.title")}
+          mark={t("gallery.mark")}
+          markColor="orange"
+          data={t("gallery.data", { count: items.length, photos: photoCount })}
+          dataColor="orange"
+        >
+          {t("gallery.lede")}
         </SectionHead>
 
         {categories.length > 1 ? (
           <div
             className="rail -mx-[clamp(1rem,4vw,3rem)] mb-14 flex gap-3 overflow-x-auto px-[clamp(1rem,4vw,3rem)] py-2"
             role="group"
-            aria-label="Filtrer les moments"
+            aria-label={t("gallery.filterAria")}
           >
             <FilterChip activeColor="orange" active={filter === "all"} onClick={() => setFilter("all")} count={items.length}>
-              Tout
+              {t("gallery.all")}
             </FilterChip>
             {categories.map((c) => (
               <FilterChip activeColor="orange" key={c} active={filter === c} onClick={() => setFilter(c)} count={items.filter((g) => g.category === c).length}>
-                {LABELS[c] ?? c}
+                {label(c)}
               </FilterChip>
             ))}
           </div>
@@ -70,7 +81,7 @@ export default function ProfessionalGallery() {
                     }
                     className="photo-sticker group relative block w-full cursor-zoom-in text-left text-noir shadow-[0_0_0_1px_var(--trait),var(--lift)] hover:[--r:0deg] hover:shadow-[0_0_0_1px_var(--trait),var(--lift-hi)]"
                     style={{ "--r": `${tilt}deg`, "--d": `${(i % 3) * 120}ms`, "--tx": `${(i % 3) - 1 === 0 ? 0 : ((i % 3) - 1) * 80}px` } as React.CSSProperties}
-                    aria-label={`Ouvrir les ${images.length} photos : ${clean(g.title)}`}
+                    aria-label={t("gallery.open", { count: images.length, title: clean(g.title) })}
                   >
                     <span className="relative block overflow-hidden rounded-[14px]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -85,7 +96,7 @@ export default function ProfessionalGallery() {
                       />
                       {images.length > 1 ? (
                         <span className="absolute bottom-3 right-3 rounded-full bg-noir px-3 py-1.5 text-[0.875rem] font-bold text-blanc">
-                          {images.length} photos
+                          {t("gallery.photos", { count: images.length })}
                         </span>
                       ) : null}
                     </span>
@@ -94,7 +105,7 @@ export default function ProfessionalGallery() {
                         className={cn("sticker px-3 py-1.5 text-[0.875rem]", `s-${colorOf(g.category)}`)}
                         style={{ "--cut": "3px", "--r": "-2deg" } as React.CSSProperties}
                       >
-                        {LABELS[g.category] ?? g.category}
+                        {label(g.category)}
                       </span>
                       <span className="mt-3 block font-display text-[1.5rem] font-extrabold leading-tight tracking-[-0.02em]">
                         {clean(g.title)}

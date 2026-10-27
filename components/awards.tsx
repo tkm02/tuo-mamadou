@@ -7,16 +7,18 @@ import { Container, Star as StarIcon, Sticker } from "@/components/kit"
 import { glitter } from "@/components/motion"
 import { TrophyShelf } from "@/components/trophy"
 import { useSiteContent, useTable } from "@/lib/use-portfolio"
+import { useLanguage } from "@/lib/i18n/context"
 import { awardsFallback, awardsSectionFallback, certificationsFallback, type AwardRow, type CertificationRow } from "@/lib/fallback-data"
 import { clean, cn, splitRank } from "@/lib/utils"
 
 export default function Awards() {
+  const { lang, t } = useLanguage()
   const awards = useTable<AwardRow>("awards", awardsFallback)
   const certifications = useTable<CertificationRow>("certifications", certificationsFallback)
   const content = useSiteContent("awards", awardsSectionFallback)
   const background = clean(content.backgroundImage ?? "")
 
-  const ranked = awards.map((a) => ({ a, r: splitRank(a.title) }))
+  const ranked = awards.map((a) => ({ a, r: splitRank(a.title, lang) }))
   const firsts = ranked.filter(({ r }) => r.n === 1)
   const others = ranked.filter(({ r }) => r.n !== 1)
 
@@ -40,9 +42,9 @@ export default function Awards() {
   }, [])
 
   const stats = [
-    { value: awards.length, label: "distinctions" },
-    { value: firsts.length, label: firsts.length > 1 ? "premiers prix" : "premier prix" },
-    { value: certifications.length, label: "certifications" },
+    { value: awards.length, label: t("awards.statAwards") },
+    { value: firsts.length, label: t(firsts.length > 1 ? "awards.statFirsts" : "awards.statFirst") },
+    { value: certifications.length, label: t("awards.statCertifications") },
   ].filter((s) => s.value > 0)
 
   // « 2022 – 2026 » : de la plus ancienne à la plus récente année citée dans les dates.
@@ -61,20 +63,20 @@ export default function Awards() {
         <header className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p data-reveal="rise" className="text-[0.8125rem] font-bold uppercase tracking-[0.22em]">
-              Palmarès{span ? ` · ${span}` : ""}
+              {t("awards.kicker")}{span ? ` · ${span}` : ""}
             </p>
             <h2
               id="awards-title"
               data-reveal="rise"
               className="mt-4 font-display text-[clamp(2.75rem,6.5vw,5.5rem)] font-extrabold leading-[0.9] tracking-[-0.03em]"
             >
-              Les{" "}
+              {t("awards.titleLead")}{" "}
               <span className="marker" style={{ "--mk": "var(--blanc)" } as React.CSSProperties}>
-                victoires
+                {t("awards.mark")}
               </span>
             </h2>
             <p data-reveal="rise" style={{ "--d": "100ms" } as React.CSSProperties} className="text-soft mt-5 max-w-[44ch] text-[1.125rem] font-medium leading-[1.5]">
-              Hackathons, compétitions, concours : la plupart remportés comme chef d&apos;équipe.
+              {t("awards.lede")}
             </p>
           </div>
 
@@ -97,8 +99,8 @@ export default function Awards() {
         <div className="mt-12 grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
           {firsts.length > 0 ? (
             <ol className={cn("grid gap-5", !background && "md:grid-cols-2 lg:col-span-2")}>
-              {firsts.map(({ a }, i) => (
-                <FirstPrize key={`${a.title}-${i}`} award={a} index={i} />
+              {firsts.map(({ a, r }, i) => (
+                <FirstPrize key={`${a.title}-${i}`} award={a} rank={r} index={i} />
               ))}
             </ol>
           ) : null}
@@ -107,10 +109,10 @@ export default function Awards() {
             <figure data-reveal="rise" style={{ "--d": "200ms" } as React.CSSProperties} className="relative -order-1 lg:order-none">
               <div className="photo-sticker" style={{ "--r": "2deg" } as React.CSSProperties}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={background} alt="Les trophées remportés" className="aspect-[4/3] w-full object-cover" />
+                <img src={background} alt={t("awards.photoAlt")} className="aspect-[4/3] w-full object-cover" />
               </div>
               <Sticker color="noir" tilt={-6} className="absolute -bottom-4 left-6 md:left-10">
-                Ma vitrine
+                {t("awards.shelf")}
               </Sticker>
             </figure>
           ) : null}
@@ -122,7 +124,7 @@ export default function Awards() {
           <div className="mt-20">
             <div className="flex items-center gap-5">
               <h3 data-reveal="rise" className="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold leading-none tracking-[-0.02em]">
-                Les trophées
+                {t("awards.trophies")}
               </h3>
               <span aria-hidden="true" className="h-px flex-1 bg-noir/25" />
             </div>
@@ -142,7 +144,7 @@ export default function Awards() {
           <div className="mt-20">
             <div className="flex items-center gap-5">
               <h3 data-reveal="rise" className="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold leading-none tracking-[-0.02em]">
-                Certifications
+                {t("awards.certifications")}
               </h3>
               <span aria-hidden="true" className="h-px flex-1 bg-noir/25" />
             </div>
@@ -168,7 +170,7 @@ export default function Awards() {
                         onClick={() => setPreview(c)}
                         className="cursor-pointer underline decoration-orange decoration-2 underline-offset-[5px] after:absolute after:inset-0 after:content-[''] hover:text-orange-deep"
                       >
-                        Voir le certificat
+                        {t("awards.viewCertificate")}
                       </button>
                     ) : null}
                     {c.verificationUrl ? (
@@ -178,7 +180,7 @@ export default function Awards() {
                         rel="noopener noreferrer"
                         className="relative z-10 underline decoration-noir/30 decoration-2 underline-offset-[5px] hover:decoration-noir"
                       >
-                        Vérifier ↗
+                        {t("awards.verify")}
                       </a>
                     ) : null}
                   </p>
@@ -197,12 +199,11 @@ export default function Awards() {
 type Rank = ReturnType<typeof splitRank>
 
 /** Premier prix : plaque au liseré orangé parcouru de lumière, le rang gravé à gauche, le récit à droite. */
-function FirstPrize({ award: a, index }: { award: AwardRow; index: number }) {
-  const r = splitRank(a.title)
+function FirstPrize({ award: a, rank: r, index }: { award: AwardRow; rank: Rank; index: number }) {
   return (
     <li data-reveal="rise" style={{ "--d": `${200 + index * 120}ms` } as React.CSSProperties}>
       <article className="plaque plaque-vif grid grid-cols-[auto_1fr] gap-x-5 p-5 md:gap-x-6 md:p-6">
-        <Rank n={1} suffix="er" className="metal metal-vif pt-1 text-[clamp(3.25rem,5vw,4.25rem)]" />
+        <Rank n={1} suffix={r.suffix} className="metal metal-vif pt-1 text-[clamp(3.25rem,5vw,4.25rem)]" />
         <div className="min-w-0">
           <p className="text-[0.8125rem] font-bold uppercase tracking-[0.16em] text-orange-deep">
             {r.kind} · {clean(a.date)}

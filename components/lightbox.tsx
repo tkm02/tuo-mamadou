@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useT } from "@/lib/i18n/context"
 import { clean } from "@/lib/utils"
 
 export type LightboxImage = { url: string; title?: string }
@@ -20,6 +21,7 @@ export default function Lightbox({
   light?: boolean
   onClose: () => void
 }) {
+  const t = useT()
   const ref = useRef<HTMLDialogElement>(null)
   const [i, setI] = useState(0)
   const count = images?.length ?? 0
@@ -50,7 +52,7 @@ export default function Lightbox({
       ref={ref}
       onClose={onClose}
       onClick={(ev) => ev.target === ref.current && onClose()}
-      aria-label={heading ?? "Visionneuse"}
+      aria-label={heading ?? t("lightbox.label")}
       className="m-auto w-[min(72rem,94vw)] overflow-hidden rounded-[28px] bg-blanc p-0 text-noir shadow-[0_0_0_6px_var(--blanc),var(--lift-hi)] backdrop:bg-noir/80"
     >
       {img ? (
@@ -64,7 +66,7 @@ export default function Lightbox({
               onClick={onClose}
               className="shrink-0 rounded-full bg-noir px-4 py-2 font-display text-[1rem] font-extrabold text-blanc"
             >
-              Fermer
+              {t("lightbox.close")}
             </button>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -73,7 +75,7 @@ export default function Lightbox({
             <div className="flex items-center justify-between gap-4 px-5 py-4 text-[1rem]">
               {count > 1 ? (
                 <button type="button" onClick={() => setI((i - 1 + count) % count)} className="rounded-full px-3 py-2 font-display font-extrabold hover:bg-jaune">
-                  ← Précédente
+                  {t("lightbox.prev")}
                 </button>
               ) : (
                 <span />
@@ -84,7 +86,7 @@ export default function Lightbox({
               </span>
               {count > 1 ? (
                 <button type="button" onClick={() => setI((i + 1) % count)} className="rounded-full px-3 py-2 font-display font-extrabold hover:bg-jaune">
-                  Suivante →
+                  {t("lightbox.next")}
                 </button>
               ) : (
                 <span />

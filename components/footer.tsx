@@ -2,9 +2,11 @@
 
 import { Container } from "@/components/kit"
 import { useSiteContent } from "@/lib/use-portfolio"
+import { useT } from "@/lib/i18n/context"
 import { socialsFallback } from "@/lib/fallback-data"
 
 export default function Footer() {
+  const t = useT()
   const socials = useSiteContent("socials", socialsFallback)
   const year = new Date().getFullYear()
 
@@ -19,15 +21,13 @@ export default function Footer() {
           <span className="text-orange">&lt;/</span>Tuo<span className="text-orange">&gt;</span>
         </p>
         <div className="mt-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-[0.875rem] font-semibold opacity-75">
-            © {year} Kolotioloma Mamadou TUO, Abidjan, Côte d&apos;Ivoire
-          </p>
-          <nav aria-label="Liens de pied de page" className="flex flex-wrap gap-2">
+          <p className="text-[0.875rem] font-semibold opacity-75">{t("footer.copy", { year })}</p>
+          <nav aria-label={t("footer.aria")} className="flex flex-wrap gap-2">
             {[
               { label: "Email", href: `mailto:${socials.email}` },
               socials.linkedin ? { label: "LinkedIn", href: socials.linkedin, ext: true } : null,
               socials.github ? { label: "GitHub", href: socials.github, ext: true } : null,
-              { label: "Haut de page ↑", href: "#top" },
+              { label: t("footer.top"), href: "#top" },
             ]
               .filter(Boolean)
               .map((l) => (
